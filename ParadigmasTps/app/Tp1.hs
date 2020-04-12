@@ -2,7 +2,10 @@
 import Data.List
 import Prelude hiding (max, min)
 import System.IO
-
+-- ghci
+-- :l archivo
+-- :r -> compilar
+-- :t funcion -> ver definicion de funcion
 -------------------------------------------
 signo :: Int -> Int
 signo number
