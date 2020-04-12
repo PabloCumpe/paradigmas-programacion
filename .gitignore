@@ -21,3 +21,17 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
+
+ParadigmasTps/.idea/libraries/base_4_13_0_0.xml
+
+ParadigmasTps/.idea/
+
+*.yaml
+
+ParadigmasTps/ChangeLog.md
+
+*.lock
+
+ParadigmasTps/ParadigmasTps.cabal
+
+ParadigmasTps/ParadigmasTps.iml
