@@ -79,7 +79,7 @@ sumaLista :: [Int] -> Int
 sumaLista [] = 0
 sumaLista (x:xs) = x + sumaLista xs
 
--------------------------------------------------------------
+-----------------------------------------------------------
 
 member :: Integer -> [Integer] -> Bool
 member number [] = False
@@ -88,19 +88,39 @@ member number (x:xs)
    | otherwise = member number xs
 
 
---------------------------------------------------------------------------
+---------------------------------------------------------------------------
 append :: [a] -> [a] -> [a]
 append x [] = x
-append [] x = x 
+append [] x = x
 append (x:xs) (a:as) = x : a : append xs as
 
 ----------------------------------------------------------------------------
 
 tomar :: Integer -> [a] -> [a]
 tomar 0 _  = []
-tomar number list = 
+tomar number list =
     newFold function newList list 0
     where
-    function x r i | i >= number      = []
-                   | otherwise = x : r (i+1)
+    function x list acc | acc >= number      = []
+                   | otherwise = x : list (acc+1)
     newList _ = []
+----------------------------------------------------------------------------
+term :: Int -> [a] -> a
+term number list = f list 1
+  where
+    f :: [a] -> Int -> a
+    f (x:xs) acc =
+      if acc == number
+        then x
+        else f xs (acc + 1)
+
+-----------------------------------------------------------------------------
+rev :: [a] -> [a]
+rev list = f list []
+    where
+        f :: [a] -> [a] -> [a]
+        f [] l = l
+        f (x:xs) l = f xs (x:l)
+        
+--------------------------------------------------------------------------------
+
