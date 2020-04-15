@@ -1,6 +1,9 @@
 -- comentario
+{-# LANGUAGE BlockArguments #-}
+
 import Prelude hiding (max, min)
 import System.IO
+
 -- ghci
 -- :l archivo
 -- :r -> compilar
@@ -44,7 +47,6 @@ factorial number = number * factorial (number - 1)
 -- C (n,m) = m! / n! (m-n)!
 combinatorio :: Integer -> Integer -> Integer
 combinatorio number1 number2
---ver como tirar una excepcion aca si el primer numero es mas chico q el segundo
   | number1 < number2 = -1
   | otherwise = result
   where
@@ -54,25 +56,30 @@ combinatorio number1 number2
     fdif = factorial dif
     result = fn1 `div` (fn2 * fdif)
 
+--ver como tirar una excepcion aca si el primer numero es mas chico q el segundo
 -----------------------------------------------
 divisiblePor :: Integer -> Integer -> Bool
 divisiblePor number1 number2 = number1 `mod` number2 == 0
+
 -----------------------------------------------
 newFold :: (a -> b -> b) -> b -> [a] -> b
-newFold  f acc [] = acc
+newFold f acc [] = acc
 newFold f acc (x:xs) = f x (newFold f acc xs)
+
 esVacia :: [x] -> Bool
-esVacia list = newFold(\x n -> 1 + n) 0 list == 0
+esVacia list = newFold (\x n -> 1 + n) 0 list == 0
 
 ---------------------------------------------------------
 cabeza :: [a] -> a
 cabeza (x:xs) = x
+
 ---------------------------------------------------------
 resto :: [a] -> [a]
 resto (x:xs) = xs
+
 ----------------------------------------------------------
 long :: [a] -> Integer
-long list = newFold(\x n -> 1 + n) 0 list
+long list = newFold (\x n -> 1 + n) 0 list
 
 ----------------------------------------------------------
 sumaLista :: [Int] -> Int
@@ -80,13 +87,11 @@ sumaLista [] = 0
 sumaLista (x:xs) = x + sumaLista xs
 
 -----------------------------------------------------------
-
 member :: Integer -> [Integer] -> Bool
 member number [] = False
 member number (x:xs)
-   | number == x = True
-   | otherwise = member number xs
-
+  | number == x = True
+  | otherwise = member number xs
 
 ---------------------------------------------------------------------------
 append :: [a] -> [a] -> [a]
@@ -95,15 +100,15 @@ append [] x = x
 append (x:xs) (a:as) = x : a : append xs as
 
 ----------------------------------------------------------------------------
-
 tomar :: Integer -> [a] -> [a]
-tomar 0 _  = []
-tomar number list =
-    newFold function newList list 0
-    where
-    function x list acc | acc >= number      = []
-                   | otherwise = x : list (acc+1)
+tomar 0 _ = []
+tomar number list = newFold function newList list 0
+  where
+    function x list acc
+      | acc >= number = []
+      | otherwise = x : list (acc + 1)
     newList _ = []
+
 ----------------------------------------------------------------------------
 term :: Int -> [a] -> a
 term number list = f list 1
@@ -117,10 +122,41 @@ term number list = f list 1
 -----------------------------------------------------------------------------
 rev :: [a] -> [a]
 rev list = f list []
-    where
-        f :: [a] -> [a] -> [a]
-        f [] l = l
-        f (x:xs) l = f xs (x:l)
-        
+  where
+    f :: [a] -> [a] -> [a]
+    f [] l = l
+    f (x:xs) l = f xs (x : l)
+
 --------------------------------------------------------------------------------
+maxl :: [Int] -> Int
+maxl [x] = x
+maxl (x:xs)
+  | maxl xs > x = maxl xs
+  | otherwise = x
+---------------------------------------------------------------------------------------------
+cuenta n [] = 0
+cuenta n (x:xs) = (if n==x then 1 else 0) + cuenta n xs
+
+-----------------------------------------------------------------------------------------------------
+repite :: a -> Int -> [a]
+repite a 0 = []
+repite a c = a : repite a (c-1)
+
+-----------------------------------------------------------------------------------------------------------
+(←→) :: Integer -> Integer -> [Integer]
+(←→) number1 number2 = f number1 []
+    where
+    f :: Integer -> [Integer]-> [Integer]
+    f number1 list
+            | number1 <= number2 = number1 : f (number1+1) list
+            | otherwise = list
+
+-----------------------------------------------------------------------------------------------------------------
+factorial2 :: Integer -> Integer
+factorial2 n = f (1 ←→ n)
+      where 
+      f :: [Integer] -> Integer
+      f [] = 1
+      f (x:xs) = x * f xs
+
 
