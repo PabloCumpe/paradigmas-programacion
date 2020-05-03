@@ -67,7 +67,8 @@ newFold f acc [] = acc
 newFold f acc (x:xs) = f x (newFold f acc xs)
 
 esVacia :: [x] -> Bool
-esVacia list = newFold (\x n -> 1 + n) 0 list == 0
+esVacia [] = True
+esVacia (_:_) = False
 
 ---------------------------------------------------------
 cabeza :: [a] -> a
@@ -144,19 +145,46 @@ repite a c = a : repite a (c-1)
 
 -----------------------------------------------------------------------------------------------------------
 (←→) :: Integer -> Integer -> [Integer]
-(←→) number1 number2 = f number1 []
+(←→) number1 number2 =
+  if (number1 > number2)
+    then []
+    else (number1 : ((number1 + 1) ←→ number2))
+
+--otra forma de hacerlo
+(←--→) number1 number2 = f number1 []
     where
     f :: Integer -> [Integer]-> [Integer]
     f number1 list
             | number1 <= number2 = number1 : f (number1+1) list
             | otherwise = list
 
+
 -----------------------------------------------------------------------------------------------------------------
+
+--recursion explicita -> cuando se ve si , por ej f llama a f
+--recursion implicita -> cuando no se ve, porque uso otra funcion q esa si tiene recursion
+
 factorial2 :: Integer -> Integer
 factorial2 n = f (1 ←→ n)
       where 
       f :: [Integer] -> Integer
       f [] = 1
       f (x:xs) = x * f xs
+      
+--otra forma de hacerlo
+factorial3 n = product (1 ←→ n)
+--------------------------------------------------------------------------------------------------------------------
+--ej 15
+addAll :: a -> [[a]] -> [[a]]
+addAll x [] = []
+addAll a (x:xs) =  (a:x) : (addAll a xs)
+
+partes [] = [[]]
+partes (x:xs) = (partes xs) ++ (addAll x (partes xs))
 
 
+-----
+--ej 16--  
+--1- f es un int
+--2- f es una terna
+--3- f 
