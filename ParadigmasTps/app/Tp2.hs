@@ -59,9 +59,28 @@ restarNats :: Nat -> Nat -> Nat
 restarNats x Cero = x
 restarNats (Suc x) (Suc y) = restarNats x y
 
+multNats :: Nat -> Nat -> Nat
+multNats Cero x = Cero
+multNats (Suc x) y = sumarNats (multNats x y) y
+
 natToInt :: Nat -> Int
 natToInt Cero = 0
 natToInt (Suc x) = f x 1
   where
   f Cero c = c
   f (Suc x) c = f x (c+1)
+
+------------------------------------------------------------------------------------
+
+-- ej 9
+data ArbBinRotHoj a = ArbolVacio | Hoja a |  ArbolNoVacio  (ArbBinRotHoj a) (ArbBinRotHoj a) deriving (Eq, Show)
+
+arbBinRotHojaEsVacio :: ArbBinRotHoj a -> Bool
+arbBinRotHojaEsVacio ArbolVacio  = True
+arbBinRotHojaEsVacio (Hoja a) = False
+arbBinRotHojaEsVacio (ArbolNoVacio si sd) = False
+
+arbBinRotHoj :: ArbBinRotHoj a -> ArbBinRotHoj a -> ArbBinRotHoj a
+arbBinRotHoj si sd
+  | arbBinRotHojaEsVacio si && arbBinRotHojaEsVacio sd = error "error"
+  | otherwise = ArbolNoVacio si sd
