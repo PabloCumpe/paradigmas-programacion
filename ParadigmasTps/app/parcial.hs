@@ -15,7 +15,7 @@ import System.IO
 --		pares 10 = [(1,9),(2,8),(3,7),(4,6),(5,5)] usar monada lista
 
 --a-
-pares :: (Ord a, Eq a, Num a) => a -> [(a, a)]
+{-pares :: (Ord a, Eq a, Num a) => a -> [(a, a)]
 pares 0 = []
 pares 1 = []
 pares num = obtenerPares (1, num - 1) num
@@ -23,7 +23,18 @@ obtenerPares :: (Ord a, Eq a, Num a) => (a, a) -> a -> [(a, a)]
 obtenerPares (a, b) c
   | a > b = []
   | a + b == c = (a, b) : obtenerPares (a + 1, b - 1) c
-  | otherwise = obtenerPares (a + 1, b - 1) c
+  | otherwise = obtenerPares (a + 1, b - 1) c-}
+
+pares :: (Ord a, Eq a, Num a) => a -> [(a, a)]
+pares 0 = []
+pares 1 = []
+pares num = f (1, num - 1) num
+    where
+    f :: (Ord a, Eq a, Num a) => (a, a) -> a -> [(a, a)]
+    f (a, b) c
+      | a > b = []
+      | a + b == c = (a, b) : f (a + 1, b - 1) c
+      | otherwise = f (a + 1, b - 1) c
 
 --b
 paresUsandoMonada num = enumFromTo 1 (div num 2) >>= (\x -> [(x,num-x)])
@@ -36,43 +47,57 @@ paresUsandoMonada num = enumFromTo 1 (div num 2) >>= (\x -> [(x,num-x)])
 -}
 
 --a
-data ArbolNRot a b = ArbolNRotVacio | Nodo a | ArbolNRotNoVacio b [ArbolNRot a b] deriving (Eq, Show)
 
 --b
 --foldr :: (a -> b -> b) -> b -> [a] -> b
-
 {-foldrANR :: (a -> c -> c) -> (b -> c) -> ArbolNRot a b -> c
-foldrANR f g arb =  foldr f (g ()) ()-}
+foldrANR f g arb = f g ()-}
+
+
+data ArbolNRot a b = ArbolVacio | Hoja a | Nodo a b [ArbolNRot a b]  deriving (Show, Read, Eq)
+
+t =  Nodo "goal" 1 [
+        Nodo "c1" 2 [
+           Nodo "c3" 3 [
+                Hoja "c5"
+                ]
+            ],
+        Nodo "c2" 1 [
+            Hoja "c4"
+            ]
+     ]
+
+sumTree :: (Num b) => ArbolNRot a b -> b
+sumTree (Hoja a) = 0
+sumTree ArbolVacio = 0
+sumTree (Nodo _ value []) = 0
+sumTree (Nodo _ value [x]) = value + sumTree x
+sumTree (Nodo a value (x:xs)) = value + sumTree x + sumTree (Nodo a 0 xs)
+
+
+rotulosRamas :: (Num b) => ArbolNRot a b -> [b]
+rotulosRamas (Hoja a) = []
+rotulosRamas ArbolVacio = []
+rotulosRamas  (Nodo a b []) = []
+rotulosRamas  (Nodo a b [x]) = [sumTree x]
+rotulosRamas (Nodo a value (x:xs)) = sumTree (Nodo a value (x:xs)): sumTree x : rotulosRamas (Nodo a 0 xs)
 
 
 
-rotulosRamas:: (Num b) => ArbolNRot a b -> [b]
-rotulosRamas ArbolNRotVacio = []
-rotulosRamas (Nodo a) = []
-{-
-rotulosRamas (ArbolNRotNoVacio b (x:xs)) = foldrANR (+)
--}
 
-
-{-rotulosRamas  ArbolNRotVacio = []
-rotulosRamas  Nodo a = []
-rotulosRamas (ArbolNRotNoVacio a b) = b + (rotulosRamas( ArbolNRot a b))-}
 
 --4)
--- map :: (a -> b) -> [a] -> [b]
--- map map :: [a -> b] -> [[a] -> [b]]
---[length, head] :: [[Int] -> Int]
--- map map [length, head] :: [[[Int]] -> [Int]]
+
 
 
 -- tipo de map map
 -- map :: (a -> b) -> [a] -> [b]
 -- map :: (y -> z) -> [y] -> [z]
 
--- map map  { a/(y -> z) , b/ [y] -> [z]} ::  [(y -> z)] -> [[y] -> [z]]  }
+-- map map  [ a/(y -> z) , b/ [y] -> [z] ] ::  [(y -> z)] -> [[y] -> [z]]  }
 
 -- tipo map map [length, head]
--- map map :: [(y -> z)] -> [[y] -> [z]] 
+-- map map :: [(y -> z)] -> [[y] -> [z]]
 -- [length, head] :: [[Int] -> Int]
 
---  { y/ [Int]  ,z /Int} ::  [[[Int]] -> [Int]] }
+--  [ y/ [Int]  ,z /Int] ::  [[[Int]] -> [Int]]
