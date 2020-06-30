@@ -30,6 +30,7 @@ pares 0 = []
 pares 1 = []
 pares num = f (1, num - 1) num
     where
+    f :: (Ord a, Eq a, Num a) => (a, a) -> a -> [(a, a)]
     f (a, b) c
       | a > b = []
       | a + b == c = (a, b) : f (a + 1, b - 1) c
@@ -37,33 +38,6 @@ pares num = f (1, num - 1) num
 
 --b
 paresUsandoMonada num = enumFromTo 1 (div num 2) >>= (\x -> [(x,num-x)])
-
-
-{-
-2)		Evaluar la siguiente expresión:
-
-		take 2 [x+1 | x <- [2,5..], even x]
-
-		utilizando modo de evaluación eager por un lado y normal order por otro, explicando con mayor detalle el modo de evaluación normal order. Considerar la evaluación de even como atómica (que reduce en un solo paso al resultado final).
--}
-
---EAGER
---  take 2 [x+1 | x <- [2,5..], even x]
---  take 2 [x+1 | x <- [2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,..], even x]
--- no termina por ser una lista infinita
---
---
---  LAZY
---     take 2 [x+1 | x <- [2,5..], even x]
---     take 2 [2+1 | 2 <- [2,5..], true]
---     take 2 [ 3  | x <- [5..]  , even x]
--- [3] take 1 [x+1 | 5 <- [5..]  , false]
--- [3] take 1 [8+1 | 8 <- [8..]  , true]
--- [3] take 1 [  9 | 8 <- [8..]  , even x]
--- [3,9]
-
-
-
 
 {-
 3)	i)	Definir el tipo de datos ArbolNRot, que representa un ï¿½rbol n-ario donde los nodos poseen un valor de un tipo dado, y donde los arcos (rï¿½tulos) que unen un nodo con cada subï¿½rbol tambiï¿½n poseen un valor de eventualmente otro tipo dado. Considerar que el tipo puede ser paramï¿½trico.
@@ -73,44 +47,61 @@ paresUsandoMonada num = enumFromTo 1 (div num 2) >>= (\x -> [(x,num-x)])
 -}
 
 --a
-data ArbolNRot a b = ArbolVacio | Hoja a | Nodo a b [ArbolNRot a b]  deriving (Show, Read, Eq)
+data ArbolNRot a b = ArbolVacio | Hoja a | Nodo a b [ArbolNRot a b] deriving (Eq, Show)
 
 --b
-
-foldrANR ::  (b -> acc -> acc) -> acc -> ArbolNRot a b -> [acc]
-foldrANR f z (Hoja a) = [z]
-foldrANR f z ArbolVacio = [z]
-foldrANR f z (Nodo a b []) = [f b z]
-foldrANR f z (Nodo a b ns) = [f b y | n <- ns, y <- foldrANR f z n]
-
---c
+--foldr :: (a -> b -> b) -> b -> [a] -> b
+{-foldrANR :: (a -> c -> c) -> (b -> c) -> ArbolNRot a b -> c
+foldrANR f g arb = f g ()-}
 
 
+data Tree a b = EmptyTree | Leaf a | Node a b [Tree a b]
+            deriving (Show, Read, Eq)
 
-rotulosRamas arb = foldrANR (+) 0
-
-
-t =  Nodo "1" 1 [
-        Nodo "2" 2 [
-           Nodo "4" 3 [
-                Hoja "6"
-                ]
+t =  Node "goal" 1 [
+        Node "c1" 2 [
+           Node "c3" 3 [
+                Leaf "c5"
+              ]
             ],
-        Nodo "3" 1 [
-            Hoja "5"
+        Node "c2" 5 [
+            Leaf "c4" 
             ]
      ]
+
+sumTree :: (Num b) => Tree a b -> b
+sumTree EmptyTree = 0
+sumTree (Node _ value []) = value
+sumTree (Node _ value [x]) = value + sumTree x
+sumTree (Node name value (x:xs)) = value + sumTree x + sumTree (Node name 0 xs)
+
+
+rotulosRamas :: (Num b) => Tree a b -> [b]
+rotulosRamas EmptyTree = []
+rotulosRamas  (Node a b []) = []
+rotulosRamas (Node a value (x:xs)) = sumTree (Node a value (x:xs)): sumTree x : rotulosRamas (Node a 0 xs)
+
+
+depth :: Tree a b -> Int
+depth EmptyTree = 0
+depth (Node _ _ []) = 1
+depth (Node _ _ [x]) = 1 + depth x
+depth (Node n v (x:xs)) = 1 + depth (Node n v xs)
+
+
 
 --4)
 
 
 
+-- tipo de map map
 -- map :: (a -> b) -> [a] -> [b]
 -- map :: (y -> z) -> [y] -> [z]
 
--- map map  [ a/(y -> z) , b/ [y] -> [z] ] ::  [(y -> z)] -> [[y] -> [z]]
+-- map map  [ a/(y -> z) , b/ [y] -> [z] ] ::  [(y -> z)] -> [[y] -> [z]]  }
 
+-- tipo map map [length, head]
 -- map map :: [(y -> z)] -> [[y] -> [z]]
 -- [length, head] :: [[Int] -> Int]
 
---  map map [length, head]  [ y/ [Int]  ,z /Int] ::  [[[Int]] -> [Int]]
+--  [ y/ [Int]  ,z /Int] ::  [[[Int]] -> [Int]]
